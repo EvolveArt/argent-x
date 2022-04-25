@@ -4,6 +4,7 @@ import create from "zustand"
 interface State {
   seedPhrase?: string
   password?: string
+  phoneNumber?: string
 }
 
 export const useSeedRecover = create<State>(() => ({}))
@@ -36,6 +37,15 @@ export const validatePassword = (password: string): boolean => {
   return false
 }
 
+export const validatePhoneNumber = (phoneNumber: string): boolean => {
+  // eslint-disable-next-line no-useless-escape
+  const regex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/g
+  if (phoneNumber.match(regex)) {
+    return true
+  }
+  return false
+}
+
 export const validateAndSetSeedPhrase = (seedPhrase: string): void => {
   if (!validateSeedPhrase(seedPhrase)) {
     throw new Error("Invalid seed phrase")
@@ -48,6 +58,13 @@ export const validateAndSetPassword = (password: string): void => {
     throw new Error("Invalid password")
   }
   return useSeedRecover.setState({ password })
+}
+
+export const validateAndSetPhoneNumber = (phoneNumber: string): void => {
+  if (!validatePhoneNumber(phoneNumber)) {
+    throw new Error("Invalid phoneNumber")
+  }
+  return useSeedRecover.setState({ phoneNumber })
 }
 
 export const validateSeedRecoverStateIsComplete = (

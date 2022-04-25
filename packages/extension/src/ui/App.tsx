@@ -39,6 +39,7 @@ import { useBackupRequired } from "./states/backupDownload"
 import {
   useSeedRecover,
   validateAndSetPassword,
+  validateAndSetPhoneNumber,
   validateSeedRecoverStateIsComplete,
 } from "./states/seedRecover"
 import { useSelectedNetwork } from "./states/selectedNetwork"
@@ -147,9 +148,10 @@ const Screen: FC = () => {
             <NewWalletScreen
               overrideTitle="New password"
               overrideSubmitText="Continue"
-              overrideSubmit={async ({ password }) => {
+              overrideSubmit={async ({ password, phoneNumber }) => {
                 try {
                   validateAndSetPassword(password)
+                  validateAndSetPhoneNumber(phoneNumber)
                   const state = useSeedRecover.getState()
                   if (validateSeedRecoverStateIsComplete(state)) {
                     await recoverBySeedPhrase(state.seedPhrase, state.password)

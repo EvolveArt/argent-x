@@ -11,7 +11,7 @@ import { FormError, H2, P } from "../components/Typography"
 import { routes } from "../routes"
 import { useAccount } from "../states/account"
 import { useAppState } from "../states/app"
-import { validatePassword } from "../states/seedRecover"
+import { validatePassword, validatePhoneNumber } from "../states/seedRecover"
 import { connectAccount, deployAccount } from "../utils/accounts"
 import { recover } from "../utils/recovery"
 import { StickyGroup } from "./ConfirmScreen"
@@ -30,7 +30,7 @@ const Container = styled.div`
 `
 
 export const NewWalletScreen: FC<{
-  overrideSubmit?: (values: { password: string }) => void
+  overrideSubmit?: (values: { password: string; phoneNumber: string }) => void
   overrideTitle?: string
   overrideSubmitText?: string
 }> = ({ overrideSubmit, overrideTitle, overrideSubmitText }) => {
@@ -45,10 +45,12 @@ export const NewWalletScreen: FC<{
   } = useForm<{
     password: string
     repeatPassword: string
+    phoneNumber: string
   }>({
     criteriaMode: "firstError",
   })
   const password = watch("password")
+  const phoneNumber = watch("phoneNumber")
 
   const handleDeploy = async (password?: string) => {
     if (!password) {
@@ -57,7 +59,7 @@ export const NewWalletScreen: FC<{
     useAppState.setState({ isLoading: true })
 
     if (overrideSubmit) {
-      await overrideSubmit({ password })
+      await overrideSubmit({ password, phoneNumber })
     } else {
       try {
         const newAccount = await deployAccount(switcherNetworkId, password)
@@ -101,6 +103,7 @@ export const NewWalletScreen: FC<{
           {errors.password?.type === "validate" && (
             <FormError>Password is too short</FormError>
           )}
+
           <Controller
             name="repeatPassword"
             control={control}
@@ -116,6 +119,27 @@ export const NewWalletScreen: FC<{
           />
           {errors.repeatPassword?.type === "validate" && (
             <FormError>Passwords do not match</FormError>
+          )}
+
+          <Controller
+            name="phoneNumber"
+            control={control}
+            defaultValue=""
+            rules={{ required: true, validate: validatePhoneNumber }}
+            render={({ field: { ref, ...field } }) => (
+              <InputText
+                autoFocus
+                type="tel"
+                placeholder="Phone Number"
+                {...field}
+              />
+            )}
+          />
+          {errors.phoneNumber?.type === "required" && (
+            <FormError>A phone number is required</FormError>
+          )}
+          {errors.phoneNumber?.type === "validate" && (
+            <FormError>Phone Number invalid</FormError>
           )}
 
           <StickyGroup>
