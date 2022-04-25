@@ -3,13 +3,14 @@ import { FC, Suspense } from "react"
 import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom"
 import styled, { createGlobalStyle } from "styled-components"
 import { normalize } from "styled-normalize"
-import { SWRConfig } from "swr"
 
 import { useEntry } from "./hooks/useEntry"
 import { useTransactionErrorScreen } from "./hooks/useTransactionErrorScreen"
 import { routes } from "./routes"
+import { AccountActivityScreen } from "./screens/AccountActivityScreen"
 import { AccountListScreen } from "./screens/AccountListScreen"
-import { AccountScreen } from "./screens/AccountScreen"
+import { AccountNftsScreen } from "./screens/AccountNftsScreen"
+import { AccountTokensScreen } from "./screens/AccountTokensScreen"
 import { ActionScreen } from "./screens/ActionScreen"
 import { AddTokenScreen } from "./screens/AddTokenScreen"
 import { BackupDownloadScreen } from "./screens/BackupDownloadScreen"
@@ -22,6 +23,7 @@ import { LegacyScreen } from "./screens/LegacyScreen"
 import { LoadingScreen } from "./screens/LoadingScreen"
 import { LockScreen } from "./screens/LockScreen"
 import { NewWalletScreen } from "./screens/NewWalletScreen"
+import { NftScreen } from "./screens/NftScreen"
 import { ResetScreen } from "./screens/ResetScreen"
 import { SeedRecoveryScreen } from "./screens/SeedRecoveryScreen"
 import { SettingsDappConnectionsScreen } from "./screens/SettingsDappConnectionsScreen"
@@ -44,7 +46,6 @@ import {
 import { useSelectedNetwork } from "./states/selectedNetwork"
 import { recoverBySeedPhrase } from "./utils/messaging"
 import { recover } from "./utils/recovery"
-import { swrCacheProvider } from "./utils/swrCache"
 
 const GlobalStyle = createGlobalStyle`
   ${normalize}
@@ -79,20 +80,20 @@ const GlobalStyle = createGlobalStyle`
 const theme = createTheme({ palette: { mode: "dark" } })
 
 export const App: FC = () => (
-  <SWRConfig value={{ provider: () => swrCacheProvider }}>
-    <ThemeProvider theme={theme}>
-      <Suspense fallback={<LoadingScreen />}>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
-          rel="stylesheet"
-        />
-        <GlobalStyle />
-        <Screen />
-      </Suspense>
-    </ThemeProvider>
-  </SWRConfig>
+  // <SWRConfig value={{ provider: () => swrCacheProvider }}>
+  <ThemeProvider theme={theme}>
+    <Suspense fallback={<LoadingScreen />}>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
+        rel="stylesheet"
+      />
+      <GlobalStyle />
+      <Screen />
+    </Suspense>
+  </ThemeProvider>
+  // </SWRConfig>
 )
 
 export const ScrollBehaviour = styled.div`
@@ -174,7 +175,16 @@ const Screen: FC = () => {
           <Route path="*" element={<ActionScreen />} />
         ) : (
           <>
-            <Route path={routes.account()} element={<AccountScreen />} />
+            <Route path={routes.accountNftPath()} element={<NftScreen />} />
+            <Route path={routes.account()} element={<AccountTokensScreen />} />
+            <Route
+              path={routes.accountNfts()}
+              element={<AccountNftsScreen />}
+            />
+            <Route
+              path={routes.accountActivity()}
+              element={<AccountActivityScreen />}
+            />
             <Route path={routes.upgrade()} element={<UpgradeScreen />} />
             <Route path={routes.accounts()} element={<AccountListScreen />} />
             <Route
