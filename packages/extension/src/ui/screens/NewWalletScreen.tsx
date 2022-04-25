@@ -127,12 +127,7 @@ export const NewWalletScreen: FC<{
             defaultValue=""
             rules={{ required: true, validate: validatePhoneNumber }}
             render={({ field: { ref, ...field } }) => (
-              <InputText
-                autoFocus
-                type="tel"
-                placeholder="Phone Number"
-                {...field}
-              />
+              <InputText type="tel" placeholder="Phone Number" {...field} />
             )}
           />
           {errors.phoneNumber?.type === "required" && (

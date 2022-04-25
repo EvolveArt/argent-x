@@ -1,3 +1,5 @@
+import { Button, Input } from "@mui/material"
+import axios from "axios"
 import { BigNumber } from "ethers"
 import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
@@ -6,6 +8,7 @@ import styled from "styled-components"
 
 import { FeeEstimation } from "../components/FeeEstimation"
 import { routes } from "../routes"
+import { useSeedRecover } from "../states/seedRecover"
 import { updateTransactionFee } from "../utils/messaging"
 import { ConfirmPageProps, ConfirmScreen } from "./ConfirmScreen"
 
@@ -33,16 +36,28 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   ...props
 }) => {
   const [disableConfirm, setDisableConfirm] = useState(false)
+  const [code, setCode] = useState("")
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
+  }
+
+  const sendCode = async () => {
+    try {
+      const state = useSeedRecover.getState()
+      await axios.post("localhost:5001/auth/sendCode", {
+        phoneNumber: state.phoneNumber,
+      })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
     <ConfirmScreen
       title="Send transaction"
       confirmButtonText="Sign"
-      disableConfirm={disableConfirm}
+      disableConfirm={disableConfirm || code.length === 0}
       selectedAccount={selectedAccount}
       onSubmit={() => {
         onSubmit(transactions)
@@ -68,6 +83,13 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       {...props}
     >
       <Pre>{JSON.stringify(transactions, null, 2)}</Pre>
+      <Input
+        value={code}
+        type="number"
+        required
+        onChange={(e) => setCode(e.target.value)}
+      />
+      <Button onClick={sendCode}>Send 2FA Code</Button>
     </ConfirmScreen>
   )
 }
