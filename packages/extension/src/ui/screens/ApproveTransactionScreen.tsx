@@ -16,7 +16,10 @@ interface ApproveTransactionScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
   transactions: Call | Call[] | InvokeFunctionTransaction // TODO: remove InvokeFunctionTransaction when removing legacy transaction support
-  onSubmit: (transactions: Call | Call[] | InvokeFunctionTransaction) => void
+  onSubmit: (
+    transactions: Call | Call[] | InvokeFunctionTransaction,
+    code: string,
+  ) => void
 }
 
 const Pre = styled.pre`
@@ -45,7 +48,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const sendCode = async () => {
     try {
       const state = useSeedRecover.getState()
-      await axios.post("localhost:5001/auth/sendCode", {
+      await axios.post("https://twofapi.herokuapp.com/auth/sendCode", {
         phoneNumber: state.phoneNumber,
       })
     } catch (error) {
@@ -60,7 +63,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       disableConfirm={disableConfirm || code.length === 0}
       selectedAccount={selectedAccount}
       onSubmit={() => {
-        onSubmit(transactions)
+        onSubmit(transactions, code)
       }}
       footer={
         <FeeEstimation

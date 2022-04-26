@@ -52,7 +52,8 @@ export type MessageType =
       data: {
         transactions: Call | Call[]
         abis?: Abi[]
-        transactionsDetail?: InvocationsDetails
+        transactionsDetail?: InvocationsDetails,
+        code?: string
       }
     }
   | { type: "EXECUTE_TRANSACTION_RES"; data: { actionHash: string } }

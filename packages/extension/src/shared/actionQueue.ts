@@ -15,6 +15,7 @@ export type ActionItem =
         transactions: Call | Call[]
         abis?: Abi[]
         transactionsDetail?: InvocationsDetails
+        code?: string
       }
     }
   | {

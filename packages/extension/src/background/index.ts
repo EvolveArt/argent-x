@@ -1,7 +1,9 @@
+import FArgentAccountCompiledContract from "!!raw-loader!../contracts/2FArgentAccount.txt"
 import ArgentAccountCompiledContract from "!!raw-loader!../contracts/ArgentAccount.txt"
 import ProxyCompiledContract from "!!raw-loader!../contracts/Proxy.txt"
 import { EncryptJWT, compactDecrypt, importJWK } from "jose"
-import { encode, number, stark } from "starknet"
+import { Abi, encode, number, stark } from "starknet"
+import { fromCallsToExecuteCalldataWithNonce } from "starknet/dist/utils/transaction"
 
 import { ActionItem } from "../shared/actionQueue"
 import { messageStream } from "../shared/messages"
@@ -330,7 +332,7 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
 
           case "TRANSACTION": {
             try {
-              const { transactions, abis, transactionsDetail } = action.payload
+              const { transactions, transactionsDetail, code } = action.payload
               if (!wallet.isSessionOpen()) {
                 throw Error("you need an open session")
               }
@@ -352,8 +354,20 @@ const successStatuses = ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"]
                 maxFee !== undefined && maxFee !== null
 
               const transaction = await starknetAccount.execute(
-                transactions,
-                abis,
+                {
+                  contractAddress: starknetAccount.address,
+                  entrypoint: "confirm_transaction",
+                  calldata: [
+                    ...fromCallsToExecuteCalldataWithNonce(
+                      Array.isArray(transactions)
+                        ? [...transactions]
+                        : [transactions],
+                      nonce + 1,
+                    ),
+                    code,
+                  ],
+                },
+                undefined,
                 {
                   ...transactionsDetail,
                   nonce,

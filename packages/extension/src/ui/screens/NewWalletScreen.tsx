@@ -63,6 +63,7 @@ export const NewWalletScreen: FC<{
     } else {
       try {
         const newAccount = await deployAccount(switcherNetworkId, password)
+        useAppState.setState({ phoneNumber })
         addAccount(newAccount)
         connectAccount(newAccount)
         navigate(await recover())

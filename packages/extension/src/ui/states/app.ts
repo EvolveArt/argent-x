@@ -8,6 +8,7 @@ interface State {
   passwordError?: string
   isLoading: boolean
   isFirstRender: boolean
+  phoneNumber?: string
 }
 
 export const useAppState = create<State>(() => ({
